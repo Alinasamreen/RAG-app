@@ -1,0 +1,34 @@
+import streamlit as st
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import RetrievalQA
+from langchain.llms import OpenAI
+from langchain.vectorstores import Pinecone
+
+# Initialize memory
+if "memory" not in st.session_state:
+    st.session_state.memory = ConversationBufferMemory(return_messages=True)
+
+# Initialize the vector store
+vectorstore = Pinecone(index, embeddings.embed_query)
+
+# Initialize the language model
+llm = OpenAI(model="text-davinci-003")
+
+# Set up the retrieval-based QA chain
+qa_chain = RetrievalQA(combine_docs_chain=llm, retriever=vectorstore.as_retriever())
+
+# Streamlit interface
+st.title("Document Q&A Chatbot with Memory")
+
+user_query = st.text_input("Ask a question:")
+
+if user_query:
+    # Retrieve answer
+    answer = qa_chain.run(user_query)
+
+    # Store the conversation in memory
+    st.session_state.memory.add_user_message(user_query)
+    st.session_state.memory.add_ai_message(answer)
+
+    # Display the answer
+    st.write(answer)
